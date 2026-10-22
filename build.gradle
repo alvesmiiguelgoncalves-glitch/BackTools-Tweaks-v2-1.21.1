@@ -1,0 +1,41 @@
+// Se for colocar este mod no mesmo repositorio do backshield/totemslot,
+// copie o build.gradle deles e ajuste so version/group/archivesName e as dependencias abaixo.
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+base { archivesName = project.archives_base_name }
+
+repositories {
+    maven { url = 'https://maven.terraformersmc.com/' }
+    maven { url = 'https://maven.shedaniel.me/' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
+        exclude group: 'net.fabricmc.fabric-api'
+    }
+    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    // MixinExtras (@WrapMethod). Em runtime o Fabric Loader ja fornece.
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.4.1"))
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand 'version': project.version }
+}
+
+tasks.withType(JavaCompile).configureEach { it.options.release = 21; it.options.encoding = 'UTF-8' }
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
+}
